@@ -1,0 +1,3 @@
+package serrors
+
+var ()

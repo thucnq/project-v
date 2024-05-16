@@ -1,0 +1,10 @@
+version: "2"
+sql:
+  - schema: "./database/migrate"
+    queries: "./internal/store/mysql/query"
+    engine: "mysql"
+    gen:
+      go:
+        package: "sqlc"
+        out: "./internal/store/mysql/sqlc"
+        emit_prepared_queries: true

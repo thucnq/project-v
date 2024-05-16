@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+    mysql:
+        platform: linux/x86_64
+        image: mysql:5.7
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_DATABASE: "workflow"
+            MYSQL_ROOT_PASSWORD: "123456789"
+            MYSQL_USER: test
+            MYSQL_PASSWORD: test
+        volumes:
+            - mysqldata:/var/lib/mysql
+        command: [ 'mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci' ]
+    redis:
+        container_name: redis
+        image: redis:alpine
+        ports:
+            - "6379:6379"
+
+    test:
+        image: golang:1.21
+        tty: true
+        working_dir: $PWD
+        volumes:
+            - $PWD:$PWD
+            - /var/run/docker.sock:/var/run/docker.sock
+        command:
+            - "/bin/sh"
+            - "-c"
+            - "go test ./internal/store/mysql/... -v"
+
+    gen-docs:
+        image: golang:1.21
+        volumes:
+            - $PWD:$PWD
+        working_dir: $PWD
+        command: >
+            sh -c "
+            go install github.com/swaggo/swag/cmd/swag@latest &&
+            swag init -g internal/app-api/api.go &&
+            rm docs/swagger_v3.yaml 2> /dev/null || true"
+
+    convert-docs:
+        image: node:latest
+        volumes:
+            - $PWD:$PWD
+        working_dir: $PWD
+        command: >
+            sh -c "
+            npm install -g api-spec-converter &&
+            api-spec-converter --from=swagger_2 --to=openapi_3 --syntax=yaml ./docs/swagger.yaml > ./docs/swagger_v3.yaml"
+
+volumes:
+    mysqldata:
+        driver: local

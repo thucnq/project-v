@@ -1,0 +1,453 @@
+syntax = "proto3";
+package pb.membership;
+
+import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "pb/membership";
+
+// Hiện tại có chat và bên task đang sử dụng
+service GapoMembership {
+  // CreateCollabGroup creates a collaborator-group
+  rpc CreateCollabGroup(CreateCollabGroupRequest) returns (CreateCollabGroupResponse) {}
+
+  // AddMember adds a member to the collaborator-group with specific roles
+  rpc AddMember(AddMemberRequest) returns (AddMemberResponse) {}
+
+  // RemoveMember removes a member from a collab-group
+  rpc RemoveMember(RemoveMemberRequest) returns (google.protobuf.Empty) {}
+
+  // // SetMemberRole sets member roles in a collab-group
+  rpc SetMemberRole(SetMemberRoleRequest) returns (google.protobuf.Empty) {}
+
+  // ListMembers
+  rpc ListMembers(ListMembersRequest) returns (ListMembersResponse) {}
+
+  // GetCollabGroup get the collab-group detail
+  rpc GetCollabGroup(GetCollabGroupRequest) returns (GetCollabGroupResponse) {}
+
+  // ListCollabGroups
+  rpc ListCollabGroups(ListCollabGroupsRequest) returns (ListCollabGroupsResponse) {}
+
+  // rpc CheckAccessPermission(CheckAccessPermissionRequest) returns (CheckAccessPermissionResponse) {}
+
+  // // GenerateInviteLink
+  // rpc GenerateInviteLink(GenerateInviteLinkRequest) returns (GenerateInviteLinkResponse) {}
+
+  // // DeleteInviteLink
+  // rpc DeleteInviteLink(DeleteInviteLinkRequest) returns (google.protobuf.Empty) {}
+
+  // // ListInviteLink list of invite links in collab-group
+  // rpc ListInviteLink(ListInviteLinkRequest) returns (ListInviteLinkResponse) {}
+
+  // RequestJoin send request join to collab-group
+  rpc RequestJoin(RequestJoinRequest) returns (RequestJoinResponse) {}
+
+  // UpdatePrivacy update privacy of collab-group
+  // rpc UpdatePrivacy(UpdatePrivacyRequest) returns (google.protobuf.Empty) {}
+
+  // // UpdateAutoAccept update config auto_accept of collab-group
+  // rpc UpdateAutoAccept(UpdateAutoAcceptRequest) returns (google.protobuf.Empty) {}
+
+  // GetMemberByIDs get member in collab-group by user ids
+  rpc GetMemberByIDs(GetMemberByIDsRequest) returns (ListMembersResponse) {}
+
+  // UpdateCollabGroup update name of collab-group
+  rpc UpdateCollabGroup(UpdateCollabGroupRequest) returns (UpdateCollabGroupResponse) {}
+
+  // rpc UnlinkOrgChart(UnlinkOrgChartRequest) returns (google.protobuf.Empty) {}
+
+  // rpc ListPendingMembers(ListPendingMembersRequest) returns (ListPendingMembersResponse) {}
+
+  // rpc ReviewPendingMember(ReviewPendingMemberRequest) returns (google.protobuf.Empty) {}
+
+  // IsMember check user is member of collab group or not
+  rpc IsMember(IsMemberRequest) returns (IsMemberResponse) {}
+
+  rpc ListAllMemberIDs(ListAllMemberIDsRequest) returns (ListAllMemberIDsResponse) {}
+
+  // // api check feature enable/disable
+  // rpc CheckFeature(CheckFeatureRequest) returns (CheckFeatureResponse) {}
+
+  rpc JoinDirectly(JoinDirectlyRequest) returns (JoinDirectlyResponse) {}
+
+  // rpc ArchivedCollabGroup(ArchivedCollabGroupRequest) returns (google.protobuf.Empty) {}
+}
+
+// DataSource the source call to membership service
+enum DataSource {
+  DATA_SOURCE_UNSPECIFIED = 0;
+  DATA_SOURCE_PC_WEB = 1;
+  DATA_SOURCE_PC_MOBILE = 2;
+  DATA_SOURCE_IOS = 3;
+  DATA_SOURCE_ANDROID = 4;
+  DATA_SOURCE_ORG_SERVICE = 5;
+  DATA_SOURCE_CHAT_SERVICE = 6;
+  DATA_SOURCE_TASK_SERVICE = 7;
+  DATA_SOURCE_MEET_SERVICE = 8;
+}
+
+// Privacy DISCARD. privacy of collab group
+enum Privacy {
+  PRIVACY_PUBLIC = 0;
+  PRIVACY_CLOSE = 1;
+  PRIVACY_SECRET = 2;
+}
+
+message Settings {
+  // discovery can find the collab-group, listed
+  bool discovery = 1;
+  // public can view content
+  bool public = 2;
+  // need_approve the manager needs to approve the request to join
+  bool need_approve = 3;
+  bool share_public_link = 4;
+}
+
+message CreateCollabGroupRequest {
+  // name of collab-group
+  string name = 1;
+  DataSource data_source = 3;
+  // caller_id the id of user create the collab-group
+  uint64 caller_id = 4;
+  // workspace_id the id of workspace of user create the collab-group
+  uint64 workspace_id = 5;
+  // department_id the id of department for case create collab-group from orgChart.
+  string department_id = 6;
+  // privacy the privacy of collab-group. DISCARD
+  //  Privacy privacy = 7;
+  // auto_accept the config allow auto accept the user join to collab-group. DISCARD
+  //  bool auto_accept = 8;
+  // id the id of collab-group. this field to support for case use id from other service as collab-group id
+  string id = 9;
+  // empty_owner if true will not add caller_id as owner of collab-group
+  bool empty_owner = 10;
+  Settings Settings = 11;
+  string avatar = 12;
+  string description = 13;
+}
+
+message CreateCollabGroupResponse {
+  string id = 1;
+}
+
+message AddMemberRequest {
+  string collab_group_id = 1;
+  uint64 user_id = 2;
+  repeated int32 role_ids = 3;
+  DataSource data_source = 4;
+  uint64 caller_id = 5;
+  uint64 workspace_id = 6;
+}
+
+message AddMemberResponse {
+  uint64 id = 1;
+}
+
+message RemoveMemberRequest {
+  string collab_group_id = 1;
+  uint64 user_id = 2;
+  DataSource data_source = 3;
+  uint64 caller_id = 4;
+  uint64 workspace_id = 5;
+}
+
+message SetMemberRoleRequest {
+  string collab_group_id = 1;
+  uint64 user_id = 2;
+  repeated int32 role_ids = 3;
+  DataSource data_source = 4;
+  uint64 caller_id = 5;
+  uint64 workspace_id = 6;
+}
+
+message ListMembersRequest {
+  enum Mode {
+    ID = 0;
+    Name = 1;
+    Workspace = 2;
+  }
+  string collab_group_id = 1;
+  uint64 caller_id = 2;
+  int64 limit = 3;
+  string starting_after = 4;
+  uint64 workspace_id = 5;
+  int32 feature_id = 6;
+  Mode mode = 7;
+}
+
+message Member {
+  uint64 id = 1;
+  string display_name = 2;
+  string avatar = 3;
+  string avatar_thumb_pattern = 4;
+  string cover = 5;
+  string cover_thumb_pattern = 6;
+  string type = 7;
+  repeated int32 role_ids = 8;
+  int64 created_at = 9;
+  int64 updated_at = 10;
+  uint64 user_id = 11;
+}
+
+message Link {
+  string next = 1;
+}
+
+message ListMembersResponse {
+  repeated Member data = 1;
+  Link link = 2;
+}
+
+message GetCollabGroupRequest {
+  string collab_group_id = 1;
+  int64 caller_id = 2;
+  uint64 workspace_id = 3;
+}
+
+message CollabGroup {
+  string collab_group_id = 1;
+  string name = 2;
+  uint64 workspace_id = 3;
+  int64 created_at = 4;
+  int64 updated_at = 5;
+  google.protobuf.Any context = 6;
+  //  Privacy privacy = 7;
+  //  bool auto_accept = 8;
+  Settings Settings = 9;
+  string avatar = 10;
+  string description = 11;
+}
+
+message GetCollabGroupResponse {
+  CollabGroup data = 1;
+}
+
+message ListCollabGroupsRequest {
+  uint64 caller_id = 1;
+  uint64 workspace_id = 2;
+  int64 limit = 3;
+  string starting_after = 4;
+}
+
+message ListCollabGroupsResponse {
+  repeated CollabGroup data = 1;
+  Link link = 2;
+}
+
+message CheckAccessPermissionRequest {
+  uint64 user_id = 1;
+  string collab_group_id = 2;
+  string action = 3;
+  string resource = 4;
+  int32 featureID = 5;
+}
+
+message CheckAccessPermissionResponse {
+  bool allow = 1;
+}
+
+message GenerateInviteLinkRequest {
+  uint64 caller_id = 1;
+  string collab_group_id = 2;
+  uint64 workspace_id = 3;
+  repeated int32 roles = 4;
+  uint64 expire_at = 5;
+}
+
+message GenerateInviteLinkResponse {
+  string invite_key = 1;
+}
+
+message RequestJoinRequest {
+  string invite_key = 1;
+  uint64 user_id = 2;
+  uint64 workspace_id = 3;
+  string collab_group_id = 4;
+  uint64 caller_id = 5;
+  DataSource data_source = 6;
+}
+
+message RequestJoinResponse {
+  enum Status {
+    UNSPECIFIED = 0;
+    Pending = 1;
+    Member = 2;
+  }
+  Status status = 1;
+}
+
+message UpdatePrivacyRequest {
+  uint64 caller_id = 1;
+  string collab_group_id = 2;
+  uint64 workspace_id = 3;
+  Privacy privacy = 4;
+  DataSource data_source = 5;
+}
+
+message UpdateAutoAcceptRequest {
+  uint64 caller_id = 1;
+  string collab_group_id = 2;
+  uint64 workspace_id = 3;
+  bool auto_accept = 4;
+  DataSource data_source = 5;
+}
+
+message DeleteInviteLinkRequest {
+  string invite_token = 1;
+  string collab_group_id = 2;
+  uint64 call_id = 3;
+  uint64 workspace_id = 4;
+}
+
+message ListInviteLinkRequest {
+  enum Mode {
+    SIMPLE = 0;
+    FULL = 2;
+  }
+
+  uint64 caller_id = 1;
+  string collab_group_id = 2;
+  uint64 workspace_id = 3;
+  Mode mode = 4;
+}
+
+message InviteLinkResponse {
+  string id = 1;
+  uint64 creator = 2;
+  string collab_group_id = 3;
+  repeated int32 roles = 4;
+  int64 expire_date = 5;
+  int64 created_at = 6;
+  uint64 workspace_id = 7;
+
+  string display_name = 8;
+  string avatar = 9;
+  string avatar_thumb_pattern = 10;
+  string cover = 11;
+  string cover_thumb_pattern = 12;
+
+  string link = 13;
+}
+
+message ListInviteLinkResponse {
+  repeated InviteLinkResponse date = 1;
+}
+
+message GetMemberByIDsRequest {
+  string collab_group_id = 1;
+  uint64 caller_id = 2;
+  uint64 workspace_id = 3;
+  repeated uint64 user_ids = 4;
+}
+
+message UpdateCollabGroupRequest {
+  string name = 1;
+  DataSource data_source = 2;
+  uint64 caller_id = 3;
+  uint64 workspace_id = 4;
+  string id = 5;
+  Settings settings = 6;
+  string avatar = 7;
+  string description = 8;
+}
+
+message UpdateCollabGroupResponse {
+  CollabGroup data = 1;
+}
+
+message UnlinkOrgChartRequest {
+  string collab_group_id = 1;
+  uint64 caller_id = 2;
+  uint64 workspace_id = 3;
+  DataSource data_source = 4;
+}
+
+message ListPendingMembersRequest {
+  // collab_group_id id of collab-group
+  string collab_group_id = 1;
+  // caller_id id of user fetch list pending members
+  uint64 caller_id = 2;
+  // workspace_id id of workspace of user fetch list pending members
+  uint64 workspace_id = 3;
+  DataSource data_source = 4;
+  ListMembersRequest.Mode mode = 5;
+  int64 limit = 6;
+  string starting_after = 7;
+}
+
+message ListPendingMembersResponse {
+  repeated Member data = 1;
+  Link link = 2;
+}
+
+message ReviewPendingMemberRequest {
+  enum Action {
+    Unknown = 0;
+    Approve = 1;
+    Reject = 2;
+  }
+  // collab_group_id id of collab-group
+  string collab_group_id = 1;
+  // caller_id id of user fetch list pending members
+  uint64 caller_id = 2;
+  // workspace_id id of workspace of user fetch list pending members
+  uint64 workspace_id = 3;
+  // user_id id of user want to review
+  uint64 user_id = 4;
+  int32 action = 5;
+}
+
+message IsMemberRequest {
+  // collab_group_id collab-group id
+  string collab_group_id = 1;
+  // user_ids the list of user id want to check
+  repeated uint64 user_ids = 4;
+}
+
+message IsMemberResponse {
+  // data map[user_id][isExists]
+  // i.e: check list user_ids=[1,2,3]
+  // => response data = {
+  //  1: true, // it's mean user 1 is member of collab group
+  //  2: false, // user 2 is not member
+  //  3:true
+  // }
+  map<string, bool> data = 1;
+}
+
+message ListAllMemberIDsRequest {
+  // collab_group_id collab-group id
+  string collab_group_id = 1;
+}
+
+message ListAllMemberIDsResponse {
+  repeated int64 data = 1;
+}
+
+message CheckFeatureRequest {
+  int32 feature = 1;
+  // collab_group_id collab-group id
+  string collab_group_id = 2;
+}
+
+message CheckFeatureResponse {
+  bool enable = 1;
+}
+
+message JoinDirectlyRequest {
+  string collab_group_id = 1;
+  uint64 user_id = 2;
+  DataSource data_source = 4;
+  uint64 workspace_id = 6;
+}
+
+message JoinDirectlyResponse {
+  uint64 id = 1;
+}
+
+message ArchivedCollabGroupRequest {
+  string collab_group_id = 1;
+  uint64 caller_id = 2;
+  uint64 workspace_id = 3;
+}

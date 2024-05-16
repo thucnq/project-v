@@ -1,0 +1,9 @@
+{
+  "ErrUnauthenticated": "Bạn cần đăng nhập để sử dụng tính năng này.",
+  "ErrInternal": "Có lỗi xảy ra. Vui lòng thử lại sau!",
+  "ErrInvalidArgument": "Tham số không hợp lệ.",
+  "ErrResourceExhausted": "Thao tác quá nhanh. Vui lòng thử lại sau.",
+  "ErrPermissionDenied": "Bạn không có quyền thực hiện hành động này.",
+  "ErrDuplicateEntry": "Tài nguyên đã tồn tại. Vui lòng thử lại.",
+  "ErrParentNotFound": "Tài nguyên cha không tồn tại."
+}

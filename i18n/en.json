@@ -1,0 +1,8 @@
+{
+  "ErrUnauthenticated": "Please login before using this feature.",
+  "ErrInternal": "An error has occurred. Please try later!",
+  "ErrInvalidArgument": "Invalid arguments.",
+  "ErrResourceExhausted": "Action too fast. Please try again later.",
+  "ErrPermissionDenied": "You do not have permission to perform this operation.",
+  "ErrDuplicateEntry": "Resource already exists. Please try again later."
+}
